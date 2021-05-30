@@ -1,2 +1,2 @@
 # cuddly-parakeet
-Apps to be developped by my for a splunk environment
+Apps to be developped by me for a splunk environment
