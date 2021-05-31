@@ -1,0 +1,11 @@
+<nav search_view="search">
+  <view name="DataGenerator" default='true'/>
+  <view name="search" />
+  <view name="reports" />
+
+
+     <view name="dashboards" />
+      
+
+  
+</nav>

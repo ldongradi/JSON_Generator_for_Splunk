@@ -1,0 +1,388 @@
+<form hideEdit="false" hideSplunkBar="false" hideExport="true" hideChrome="false" theme="light" version="1.1">
+  <label>Data Generator</label>
+  <description>These events are not indexed - The output can be exported as raw txt file - The results can also be opened in search for extra manipulation - For an exact number of events, set both Reduce boxes to 0%.</description>
+  <fieldset submitButton="true" autoRun="true">
+    <input id="drop5" type="dropdown" token="format_tok" searchWhenChanged="true">
+      <label>Output Format</label>
+      <choice value="json">JSON</choice>
+      <choice value="log">LOG like</choice>
+      <change>
+        <condition value="json">
+          <unset token="logdisplay"></unset>
+          <set token="jsondisplay"></set>
+        </condition>
+        <condition value="log">
+          <unset token="jsondisplay"></unset>
+          <set token="logdisplay"></set>
+        </condition>
+      </change>
+      <default>log</default>
+      <initialValue>log</initialValue>
+    </input>
+    <input id="text5" type="text" token="count_tok" searchWhenChanged="false">
+      <label>Number of events</label>
+      <default>200</default>
+    </input>
+    <input id="timeinput" type="dropdown" token="time_tok" searchWhenChanged="false">
+      <label>Timerange</label>
+      <choice value="600">-10m</choice>
+      <choice value="3600">-1h</choice>
+      <choice value="86400">-1d</choice>
+      <choice value="604800">-1w</choice>
+      <choice value="2592000">-30d</choice>
+      <choice value="31557600">-1y</choice>
+      <default>86400</default>
+      <initialValue>86400</initialValue>
+    </input>
+    <input id="drop6" type="dropdown" token="dateformat_tok">
+      <label>Date Format</label>
+      <choice value="human">human</choice>
+      <choice value="timestamp">alien</choice>
+      <default>human</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Customization</title>
+      <input id="drop1" type="dropdown" token="firststart_tok">
+        <label>IP 1st Octet Start</label>
+        <default>60</default>
+        <fieldForLabel>rank</fieldForLabel>
+        <fieldForValue>rank</fieldForValue>
+        <search>
+          <query>|makeresults count=10 | streamstats count as rank |eval rank=(rank)*10</query>
+        </search>
+      </input>
+      <input id="drop2" type="dropdown" token="firstrange_tok">
+        <label>IP 1st Octet Range</label>
+        <default>4</default>
+        <fieldForLabel>rank</fieldForLabel>
+        <fieldForValue>rank</fieldForValue>
+        <search>
+          <query>|makeresults | eval rank="1 2 4 8 64 128" | makemv rank  | mvexpand rank</query>
+        </search>
+      </input>
+      <input id="drop3" type="dropdown" token="laststart_tok">
+        <label>IP Last Octet Start</label>
+        <default>70</default>
+        <fieldForLabel>rank</fieldForLabel>
+        <fieldForValue>rank</fieldForValue>
+        <search>
+          <query>|makeresults count=5 | streamstats count as rank |eval rank=(2*rank+5)*10</query>
+        </search>
+      </input>
+      <input id="drop4" type="dropdown" token="lastrange_tok">
+        <label>IP Last Octet Range</label>
+        <default>4</default>
+        <fieldForLabel>rank</fieldForLabel>
+        <fieldForValue>rank</fieldForValue>
+        <search>
+          <query>|makeresults | eval rank="1 2 4 8 16 32" | makemv rank  | mvexpand rank</query>
+        </search>
+      </input>
+      <input type="dropdown" token="weekend_tok" searchWhenChanged="true">
+        <label>Reduce Week End Activity</label>
+        <default>50</default>
+        <fieldForLabel>choice</fieldForLabel>
+        <fieldForValue>value</fieldForValue>
+        <search>
+          <query>| makeresults count=8 | streamstats count | eval value=(count-1)*10 | eval choice="-".value."%"</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </input>
+      <input type="dropdown" token="nights_tok" searchWhenChanged="true">
+        <label>Reduce Night Activity</label>
+        <default>60</default>
+        <fieldForLabel>choice</fieldForLabel>
+        <fieldForValue>value</fieldForValue>
+        <search>
+          <query>| makeresults count=8 | streamstats count | eval value=(count-1)*10 | eval choice="-".value."%"</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input id="text3" type="text" token="domainlist" searchWhenChanged="true">
+        <label>Domain</label>
+        <default>network network security security security security security security security security web web web web user user user user user user user user maintenance maintenance weather</default>
+      </input>
+      <input id="text4" type="text" token="categorylist" searchWhenChanged="true">
+        <label>Category</label>
+        <default>problem issue situation operation intervention</default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input id="text1" type="text" token="customlist" searchWhenChanged="true">
+        <label>Custom</label>
+        <default>200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 300 300 400 400 400 400 400 404 404 404 404 404 501 501 501 501 503 503 503</default>
+      </input>
+      <input id="text2" type="text" token="severitylist" searchWhenChanged="true">
+        <label>Severity</label>
+        <default>critical critical info info info info info info info info info info info info info info info info debug info info debug info info debug info info debug info info debug info info debug info info debug debug debug debug debug debug debug debug debug debug debug debug debug debug debug debug debug debug warning error warning error warning error warning error warning error warning error warning warning warning warning warning warning error warning error</default>
+      </input>
+      <html>
+        <style>
+          
+          #drop5 { width: 150px ; }
+          #drop5 [data-component] { width: auto !important ; }
+          #drop6 { width: 150px ; }
+          #drop6 [data-component] { width: auto !important ; }
+          #timeinput { width: 150px ; }
+          #timeinput [data-component] { width: auto !important ; }
+        
+          #drop1 { width: 150px ; }
+          #drop1 [data-component] { width: auto !important ; }
+          #drop2 { width: 150px ; }
+          #drop2 [data-component] { width: auto !important ; }
+          #drop3 { width: 150px ; }
+          #drop3 [data-component] { width: auto !important ; }
+          #drop4 { width: 150px ; }
+          #drop4 [data-component] { width: auto !important ; }
+          #text1 { width: 700px ; }           
+          #text2 { width: 700px ; }    
+          #text3 { width: 700px ; }    
+          #text4 { width: 700px ; } 
+          #text5 { width: 150px ; }
+        </style>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$jsondisplay$">
+      <title>JSON format</title>
+      <input type="dropdown" token="display_tok" searchWhenChanged="true">
+        <label></label>
+        <choice value="list">Show syntax highlighted</choice>
+        <choice value="raw">Show as raw text</choice>
+        <default>list</default>
+        <initialValue>raw</initialValue>
+      </input>
+    </panel>
+    <panel depends="$jsondisplay$">
+      <input type="checkbox" token="env_sub_tok" searchWhenChanged="false">
+        <label></label>
+        <choice value="yes">Environment Fields</choice>
+        <change>
+          <condition value="yes">
+            <set token="env_visible">"true"</set>
+            <set token="env_inputvisible"></set>
+          </condition>
+          <condition>
+            <set token="env_visible">"false"</set>
+            <unset token="env_inputvisible"></unset>
+          </condition>
+        </change>
+        <initialValue>yes</initialValue>
+      </input>
+      <input depends="$env_inputvisible$" type="radio" token="env_display">
+        <label></label>
+        <choice value="Indented">array</choice>
+        <choice value="Flat">kv pairs</choice>
+        <default>Indented</default>
+        <initialValue>Indented</initialValue>
+      </input>
+      <input depends="$env_inputvisible$" type="checkbox" token="env_tok" searchWhenChanged="false">
+        <label></label>
+        <choice value="category">category</choice>
+        <choice value="city">city</choice>
+        <choice value="domain">domain</choice>
+        <choice value="ip">ip</choice>
+        <initialValue>category,city,domain,ip</initialValue>
+        <delimiter>;</delimiter>
+        <prefix>"</prefix>
+        <suffix>"</suffix>
+        <default>category,city,domain,ip</default>
+      </input>
+    </panel>
+    <panel depends="$jsondisplay$">
+      <input type="checkbox" token="id_sub_tok" searchWhenChanged="false">
+        <label></label>
+        <choice value="yes">Identity Fields</choice>
+        <change>
+          <condition value="yes">
+            <set token="id_visible">"true"</set>
+            <set token="id_inputvisible"></set>
+          </condition>
+          <condition>
+            <set token="id_visible">"false"</set>
+            <unset token="id_inputvisible"></unset>
+          </condition>
+        </change>
+        <initialValue>yes</initialValue>
+      </input>
+      <input depends="$id_inputvisible$" type="radio" token="id_display">
+        <label></label>
+        <choice value="Indented">array</choice>
+        <choice value="Flat">kv pairs</choice>
+        <default>Indented</default>
+        <initialValue>Indented</initialValue>
+      </input>
+      <input depends="$id_inputvisible$" type="checkbox" token="id_tok" searchWhenChanged="false">
+        <label></label>
+        <choice value="firstname">firstname</choice>
+        <choice value="lastname">lastname</choice>
+        <choice value="origin">origin</choice>
+        <choice value="username">username</choice>
+        <initialValue>firstname,lastname,username</initialValue>
+        <delimiter>;</delimiter>
+        <default>firstname,lastname,username</default>
+        <prefix>"</prefix>
+        <suffix>"</suffix>
+      </input>
+    </panel>
+    <panel depends="$jsondisplay$">
+      <input type="checkbox" token="trans_sub_tok" searchWhenChanged="false">
+        <label></label>
+        <choice value="yes">Transaction Fields</choice>
+        <change>
+          <condition value="yes">
+            <set token="trans_visible">"true"</set>
+            <set token="transinput_visible"></set>
+          </condition>
+          <condition>
+            <set token="trans_visible">"false"</set>
+            <unset token="transinput_visible"></unset>
+          </condition>
+        </change>
+        <initialValue>yes</initialValue>
+        <delimiter> </delimiter>
+      </input>
+      <input depends="$transinput_visible$" type="radio" token="txn_display">
+        <label></label>
+        <choice value="Indented">array</choice>
+        <choice value="Flat">kv pairs</choice>
+        <default>Indented</default>
+        <initialValue>Indented</initialValue>
+      </input>
+      <input depends="$transinput_visible$" type="checkbox" token="txn_tok" searchWhenChanged="false">
+        <label></label>
+        <choice value="pid">pid</choice>
+        <choice value="ref">ref</choice>
+        <choice value="score">score</choice>
+        <choice value="custom">custom</choice>
+        <delimiter>;</delimiter>
+        <prefix>"</prefix>
+        <suffix>"</suffix>
+        <default>pid,ref,score</default>
+        <initialValue>pid,ref,score,custom</initialValue>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$jsondisplay$">
+      <title>custom json</title>
+      <event>
+        <search>
+          <query>index=dummy earliest=-1s 
+| append 
+    [| makeresults count=$count_tok$
+    | eval _time=_time-(random()%$time_tok$)
+        `randomtime($nights_tok$)``randomweek($weekend_tok$)`
+    | eval date=if("$dateformat_tok$"="timestamp" , _time , strftime(_time,"%d/%m/%Y %T"))
+    
+    `spacelist(_custom,"$customlist$")`
+    `spacelist(_domain,"$domainlist$")`
+    `spacelist(_category,"$categorylist$")`
+    `spacelist(_severity,"$severitylist$")`
+    `randomname(lastnames.csv)` `randomname(firstnames.csv)` `randomname(cities.csv)`
+        
+    | eval _ip=(
+    random()%$firstrange_tok$+$firststart_tok$) . "." . (
+    random()%3*3+78) . "." . (
+    random()%3*7+25) . "." . (
+    random()%$lastrange_tok$+$laststart_tok$)
+    | eval _origin=origin, _lastname=lastname, _firstname=firstname, _city=city , _username=lower(substr(firstname,1,1).lastname), _pid=(random()%12876+31), _score=(random()/random())
+    | eval _ref=(floor(1+random()%1984/100)*16)+100
+    | eval _ref=if(random()%200&lt;1,_ref*10,_ref)
+    | eval _pid=if(random()%300&lt;1,_pid*15*((random()%2)*2-1),_pid)
+    
+        `jsonfield($env_tok$,domain)`
+        `jsonfield($env_tok$,category)`
+        `jsonfield($env_tok$,ip)`
+        `jsonfield($env_tok$,city)`
+        `jsonfield($id_tok$,username)`
+        `jsonfield($id_tok$,lastname)`
+        `jsonfield($id_tok$,firstname)`
+        `jsonfield($id_tok$,origin)`
+        `jsonfield($txn_tok$,ref)`
+        `jsonfield($txn_tok$,pid)`
+        `jsonfield($txn_tok$,score)`
+        `jsonfield($txn_tok$,custom)`
+        
+    | eval _environment=case($env_visible$="false" , "" , "$env_display$" ="Indented", ",\"environment\": [{" . _category . _city . _domain . _ip . "}]" , true() , "," . _category . _city . _domain . _ip)         
+    | eval _identity=case($id_visible$="false" , "" , "$id_display$" ="Indented", ",\"identity\": [{" . _firstname . _lastname . _origin . _username . "}]" , true() , "," ._firstname . _lastname . _origin . _username) 
+    | eval _transaction=case($trans_visible$="false" , "" , "$txn_display$" ="Indented", ",\"transaction\": [{" . _pid . _ref . _score . _custom . "}]", true() , "," ._pid . _ref . _score . _custom)
+    | eval _raw="{ \"date\":\"" . date . "\",\"" . "severity\":\"" . _severity . "\"" . _environment ._identity . _transaction ."}" ]
+    | fields - spacelist</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">4</option>
+        <option name="link.inspectSearch.visible">0</option>
+        <option name="link.openSearch.text">Save as a report to call with |savedsearch ...</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">0</option>
+        <option name="raw.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.link.visible">0</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">1</option>
+        <option name="table.drilldown">none</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">$display_tok$</option>
+      </event>
+    </panel>
+    <panel depends="$logdisplay$">
+      <title>custom log like</title>
+      <event>
+        <search>
+          <query>index=dummy earliest=-1s 
+| append 
+    [| makeresults count=$count_tok$
+    | eval _time=_time-(random()%$time_tok$)
+        `randomtime($nights_tok$)``randomweek($weekend_tok$)`
+    | eval date=if("$dateformat_tok$"="timestamp",_time,strftime(_time,"%d/%m/%Y %T"))
+        
+        `spacelist(custom,"$customlist$")`
+        `spacelist(_problem,"$domainlist$")`
+        `spacelist(_severity,"$severitylist$")`
+        `spacelist(_category,"$categorylist$")`
+        
+        `dashlist(_where," in - in - in - in - in - in - in - at - to ")`
+        `dashlist(_how," by - from - from - from - from - from - from - with ")`
+        
+        `randomname(firstnames.csv)` `randomname(lastnames.csv)` `randomname(cities.csv)`
+    | eval _user=lower(substr(firstname,1,1).lastname)
+    | lookup myknownusers.csv user as _user output user as _knownuser | eval _validity=if(_user=_knownuser,"","invalid ")
+    | eval _ip=(
+    random()%$firstrange_tok$+$firststart_tok$) . "." . (
+    random()%3*3+78) . "." . (
+    random()%3*7+25) . "." . (
+    random()%$lastrange_tok$+$laststart_tok$)
+    | eval _txn=(floor(1+random()%1984/100)*16)+50
+    | eval _txn=if(random()%100&lt;1,_txn*7*((random()%2)*2-1),_txn)
+    | eval _category=case(_category LIKE "_%"," ".'_category')
+    | eval _raw=date . " [" . (random()%9876+1) . "] " . upper(_severity) ." " . _problem . _category . _where . city . " from " . _validity. "user " . _user . " from " . _ip . " port " . (random()%3000+22) . " txn:" . _txn . ", " . (random()/random()) . " " . custom ]
+    | fields - spacelist,dashlist</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="list.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="link.inspectSearch.visible">0</option>
+        <option name="refresh.link.visible">0</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="link.openSearch.text">Save as a report to call with |savedsearch ...</option>
+      </event>
+    </panel>
+  </row>
+</form>
