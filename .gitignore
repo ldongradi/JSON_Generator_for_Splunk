@@ -1,2 +1,2 @@
-#ignore all .txt files
+#ignore all .DS_Store files from MacOs Local directories
 .DS_Store
